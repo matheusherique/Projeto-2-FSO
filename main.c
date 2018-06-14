@@ -1,12 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAX_ADDRESSES 10000
 
+void getPage(int address);
 void binaryToText(char *inputFile, char *outputFile);
 
 int main(int argc, char const *argv[]) {
-  address_file = fopen(argv[1], "r");
-  binaryToText("BACKING_STORE.bin", "out.txt");
-  return 0;
+    if(argc != 2) {
+        printf("Error: should be ./proj02.out addresses.txt\n");
+        exit(1);
+    }
+    FILE *address_file = fopen(argv[1], "r");
+    if(address_file == NULL) {
+        printf("Error: couldn't open the file addresses.txt\n");
+    }
+    for(int i = 0; i < MAX_ADDRESSES; ++i) {
+        int address;
+        fscanf(address_file, "%d", &address);
+        getPage(address);
+    }
+    return 0;
 }
 
 void binaryToText(char *inputFile, char *outputFile) {
@@ -28,4 +41,11 @@ void binaryToText(char *inputFile, char *outputFile) {
     }
     fclose(finp);
     fclose(fout);
+}
+
+void getPage(int address) {
+    int sprain, pageNumber;
+    pageNumber = address >> 8;
+    sprain = address & 0xFFFF >> 8;
+    printf("Logical Address: %d\nPage Number: %d\nSprain: %d\n", address, pageNumber, sprain);
 }
