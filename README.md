@@ -15,4 +15,4 @@ gcc main.c log/* -o main -std=c99 -Ilog -DLOG_USE_COLOR
 ```
 .\main addresses.txt
 ```
-* Apos executado o comando acima o programa irá começar.
+* Após executado o comando, só aguardar a execução.

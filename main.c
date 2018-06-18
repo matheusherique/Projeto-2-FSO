@@ -37,9 +37,9 @@ int main(int argc, char const *argv[]) {
     }
     readBinary("BACKING_STORE.bin", argv[1]);
     printf("Page Faults: %d\n", pageFaults);
-    printf("Page Faults Percentual: %.2f%\n", (double) pageFaults / (double)MAX_ADDRESSES * 100.0);
+    printf("Page Faults Percentual: %.2f%%\n", (double) pageFaults / (double)MAX_ADDRESSES * 100.0);
     printf("TLB Hits: %d\n", hits);
-    printf("TLB Hit Percentual = %.2f%\n", (double) hits / (double)MAX_ADDRESSES * 100.0);
+    printf("TLB Hit Percentual = %.2f%%\n", (double) hits / (double)MAX_ADDRESSES * 100.0);
     fclose(addressFile);
     fclose(backingStore);
 
@@ -85,8 +85,8 @@ void getPage(int virtualAdress) {
 
     insertTLB(pageNumber, frame);
     memoryByteValue = physicalMemory[frame][sprain];
-    printf("Logical Address: %d\nPage Number: %d\nSprain: %d\n", virtualAdress, pageNumber, sprain);
-    printf("Frame Number: %d\nPhysical Address: %d\nByte Value: %d\n", frame, (frame << 8) | sprain, memoryByteValue);
+    log_debug("Logical Address: %d\nPage Number: %d\nSprain: %d\n", virtualAdress, pageNumber, sprain);
+    log_debug("Frame Number: %d\nPhysical Address: %d\nByte Value: %d\n", frame, (frame << 8) | sprain, memoryByteValue);
 }
 
 void insertTLB(int pageNumber, int frameNumber) {
