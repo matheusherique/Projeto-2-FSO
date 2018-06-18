@@ -8,6 +8,7 @@
 #define MAX_FRAME 256
 #define ADDRESS_MASK 65535
 #define SPRAIN_MASK 255
+#define CHUNK 256
 
 void getPage(int address);
 void readBinary(char *inputFile, char const *argv);
@@ -26,7 +27,7 @@ int framesTable[MAX_FRAME];
 int numOfTLB = 0, hits = 0, firstFrame = 0, firstPage = 0;
 char logicalAddress[10];
 signed char memoryByteValue;
-signed char buffer[256];
+signed char buffer[CHUNK];
 
 int main(int argc, char const *argv[]) {
     if(argc != 2) {
@@ -35,10 +36,10 @@ int main(int argc, char const *argv[]) {
         exit(1);
     }
     readBinary("BACKING_STORE.bin", argv[1]);
-    printf("TLB Hits: %d\n", hits);
-    printf("TLB Hit Percentual = %.4f\n", (double) hits / (double)MAX_ADDRESSES);
     printf("Page Faults: %d\n", pageFaults);
-    printf("Page Faults Percentual: %.4f\n", (double) pageFaults / (double)MAX_ADDRESSES);
+    printf("Page Faults Percentual: %.2f%\n", (double) pageFaults / (double)MAX_ADDRESSES * 100.0);
+    printf("TLB Hits: %d\n", hits);
+    printf("TLB Hit Percentual = %.2f%\n", (double) hits / (double)MAX_ADDRESSES * 100.0);
     fclose(addressFile);
     fclose(backingStore);
 
@@ -84,7 +85,8 @@ void getPage(int virtualAdress) {
 
     insertTLB(pageNumber, frame);
     memoryByteValue = physicalMemory[frame][sprain];
-    printf("Page Number: %d\nLogical Address: %d\nSprain: %d\nFrame Number: %d\n", pageNumber, virtualAdress, sprain, frame);
+    printf("Logical Address: %d\nPage Number: %d\nSprain: %d\n", virtualAdress, pageNumber, sprain);
+    printf("Frame Number: %d\nPhysical Address: %d\nByte Value: %d\n", frame, (frame << 8) | sprain, memoryByteValue);
 }
 
 void insertTLB(int pageNumber, int frameNumber) {
@@ -125,7 +127,13 @@ void insertTLB(int pageNumber, int frameNumber) {
 }
 
 void readStore(int pageNumber){
-    for(int i = 0; i < 256; ++i){
+    if(fseek(backingStore, pageNumber * CHUNK, SEEK_SET) != 0) {
+        log_error("Error seeking in backing store\n");
+    }
+    if(fread(buffer, sizeof(signed char), CHUNK, backingStore) == 0) {
+        log_error("Error reading from backing store\n");
+    }
+    for(int i = 0; i < CHUNK; ++i){
         physicalMemory[firstFrame][i] = buffer[i];
     }
 
